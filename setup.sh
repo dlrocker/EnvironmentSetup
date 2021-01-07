@@ -9,6 +9,8 @@ function help() {
 	echo "Usage: $0 --go --help"
 	echo
 	echo "--go   : Flag to specify installing the GO programming language"
+	echo "--docker   : Flag to specify installing Docker"
+	echo "--minikube : Flag to specify installing minikube. Note: Also installs Docker."
 	echo "--help : Flag to call the help() function and exit the script"
 	echo
 }
@@ -51,30 +53,43 @@ function main() {
 	if [ "$INSTALL_GOLANG" == "true" ]; then
 		echo "Installing the GO programming language"
 		ansible-playbook $PROGRAMMING_DIR/install_go.yml || { echo "Failure installing the GO programming language"; exit 1; }
+		echo "It is recommended to source your users bash profile prior to executing more commands"
+		echo -e "\nCommand to execute: \"source ~/.bash_profile\"\n"
+	fi
+	if [ "$INSTALL_DOCKER" == "true" ]; then
+		echo "Installing Docker"
+		ansible-playbook $MINIKUBE_DIR/install_docker.yml || { echo "Failure installing Docker"; exit 1; }
+	fi
+	if [ "$INSTALL_MINIKUBE" == "true" ]; then
+		echo "Installing minikube"
+		ansible-playbook $MINIKUBE_DIR/install_minikube.yml || { echo "Failure installing minikube"; exit 1; }
 	fi
 	
-	echo "Finished installing! It is recommended to source your users bash profile prior to executing more commands"
-	echo "in order to pick up any path changes."
-	echo -e "\nCommand to execute: \"source ~/.bash_profile\"\n"
+	echo "Finished installing!"
 }
 
 # Define constants
 SCRIPT_DIR=$(dirname "$0")
 ANSIBLE_INVENTORY=/etc/ansible/hosts
 PROGRAMMING_DIR=$SCRIPT_DIR/programming_languages	# Directory for programming language installation playbooks
+MINIKUBE_DIR=$SCRIPT_DIR/minikube					# Directory for installation of docker/minikube
 OTHER_DIR=$SCRIPT_DIR/other							# Directory for installation playbooks of random tools
 
 # TODO - add a "all" option to install all tools
-ARGUMENTS=`getopt -n $0 -o "" --long go,help -- "$@"`
+ARGUMENTS=`getopt -n $0 -o "" --long go,docker,minikube,help -- "$@"`
 if [ $# -eq 0 ]; then help; exit 0; fi
 eval set -- "$ARGUMENTS"
 
 INSTALL_GOLANG="false"	# Determines whether golang is installed
+INSTALL_DOCKER="false"	# Determines whether Docker is installed
+INSTALL_MINIKUBE="false" # Determines whether minikube and docker are installed
 
 # Initialize setup
 while true; do
 	case "$1" in
-		--go )		INSTALL_GOLANG="true"; shift ;;
+		--go )			INSTALL_GOLANG="true"; shift ;;
+		--docker )		INSTALL_DOCKER="true"; shift ;;
+		--minikube )	INSTALL_MINIKUBE="true"; shift ;;
 		--help )	help; exit ;;
 		-- )		shift; break ;;
 		*) 			help; exit 1 ;;

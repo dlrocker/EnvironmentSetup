@@ -1,0 +1,13 @@
+# Ansible playbook for installing minikube. Base
+# instructions can be found at
+# https://minikube.sigs.k8s.io/docs/start/
+- import_playbook: install_docker.yml
+- name: Install minikube
+  hosts: local
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Install minikube
+      yum:
+        name: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
+        state: present
