@@ -1,0 +1,33 @@
+- name: Install the GO programming language
+  hosts: local
+  become: yes
+  become_method: sudo
+  tasks:
+          - name: Create Download directory
+            file:
+                    path: /tmp/go
+                    state: directory
+                    mode: '0777'
+          - name: Download GO media
+            get_url:
+                    url: https://golang.org/dl/go1.15.6.linux-amd64.tar.gz
+                    dest: /tmp/go1.15.6.linux-amd64.tar.gz
+                    mode: '0777'
+          - name: Unpack GO media
+            unarchive:
+                    src: /tmp/go1.15.6.linux-amd64.tar.gz
+                    dest: /usr/local/
+                    mode: '0777'
+          - name: Update environment PATH variable
+            lineinfile:
+                    dest: /etc/profile.d/golang.sh
+                    line: export PATH=$PATH:/usr/local/go/bin
+                    state: present
+                    insertafter: EOF
+                    create: True
+                    group: root
+                    owner: root
+                    mode: '0664'
+          - name: Refresh the current shell session
+            shell: source ~/.bash_profile
+
