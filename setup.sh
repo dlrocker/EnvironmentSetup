@@ -52,6 +52,7 @@ function main() {
 SCRIPT_DIR=$(dirname "$0")
 ANSIBLE_INVENTORY=/etc/ansible/hosts
 
+# TODO - add a "all" option to install all tools
 ARGUMENTS=`getopt -n $0 -o "" --long go,help -- "$@"`
 if [ $# -eq 0 ]; then help; exit 0; fi
 eval set -- "$ARGUMENTS"
