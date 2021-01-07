@@ -11,6 +11,9 @@ install options:
 ./setup.sh <install options>
 ```
 
+The currently supported install options are:
+- `--go`: Installs the GOLANG programming language version 1.15.6
+
 **NOTE:** If you are installing as a non-root user who has sudo privileges, use the following command instead
 ```
 sudo ./setup.sh <install options>

@@ -14,8 +14,18 @@ function help() {
 }
 
 function setup_ansible() {
-	yum -y install epel-release || { echo "Failure installing ansible"; return 1; }
-	yum -y install ansible || { echo "Failure installing ansible"; return 1; }
+	if rpm -q epel-release > /dev/null 2>&1; then
+		echo "epel-release is already installed. Skipping."
+	else
+		yum -y install epel-release || { echo "Failure installing ansible"; return 1; }
+	fi
+	
+	if rpm -q ansible > /dev/null 2>&1; then
+		echo "ansible is already installed. Skipping."
+	else
+		yum -y install ansible || { echo "Failure installing ansible"; return 1; }
+	fi
+	
 	
 	inventory_file=$SCRIPT_DIR/inventory.ini
 	if [ -f "$inventory_file" ]; then
@@ -40,7 +50,7 @@ function main() {
 	
 	if [ "$INSTALL_GOLANG" == "true" ]; then
 		echo "Installing the GO programming language"
-		ansible-playbook install_go.yml || { echo "Failure installing the GO programming language"; exit 1; }
+		ansible-playbook $PROGRAMMING_DIR/install_go.yml || { echo "Failure installing the GO programming language"; exit 1; }
 	fi
 	
 	echo "Finished installing! It is recommended to source your users bash profile prior to executing more commands"
@@ -51,6 +61,8 @@ function main() {
 # Define constants
 SCRIPT_DIR=$(dirname "$0")
 ANSIBLE_INVENTORY=/etc/ansible/hosts
+PROGRAMMING_DIR=$SCRIPT_DIR/programming_languages	# Directory for programming language installation playbooks
+OTHER_DIR=$SCRIPT_DIR/other							# Directory for installation playbooks of random tools
 
 # TODO - add a "all" option to install all tools
 ARGUMENTS=`getopt -n $0 -o "" --long go,help -- "$@"`
