@@ -1,7 +1,7 @@
 # Ansible playbook to create a sudo/admin user
 # Run playbook in the following way as root user:
 #
-# ansible-playbook /path/create_sudo_user.yml --extra-vars "user=<username> passwd={{ '<password>' | password_hash('sha512', '<encryption_phrase>') }}"
+# ansible-playbook /path/create_sudo_user.yml --extra-vars "user=<username> display_name=<display name> passwd={{ '<password>' | password_hash('sha512', '<encryption_phrase>') }}"
 #
 # If running as a non-root user with sudo access, start the command with sudo
 - name: Create a new OS user with sudo permissions
@@ -12,7 +12,7 @@
      - name: Create user
        user:
           name: "{{ user }}"
-          comment: "Privileged user"
+          comment: "{{ display_name }}"
           password: "{{ passwd }}"
           create_home: yes
           group: wheel
