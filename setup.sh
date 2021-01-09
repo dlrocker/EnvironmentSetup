@@ -9,6 +9,7 @@ function help() {
 	echo "Usage: $0 --go --help"
 	echo
 	echo "--go   : Flag to specify installing the GO programming language"
+	echo "--python38 : Flag to specify installing Python version 3.8"
 	echo "--docker   : Flag to specify installing Docker"
 	echo "--minikube : Flag to specify installing minikube. Note: Also installs Docker."
 	echo "--help : Flag to call the help() function and exit the script"
@@ -45,6 +46,11 @@ function setup_ansible() {
 	fi
 }
 
+function refresh_bash_profile() {
+	echo "It is recommended to source your users bash profile prior to executing more commands"
+	echo -e "\nCommand to execute: \"source ~/.bash_profile\"\n"
+}
+
 
 function main() {
 	echo "Starting setup process"
@@ -53,8 +59,12 @@ function main() {
 	if [ "$INSTALL_GOLANG" == "true" ]; then
 		echo "Installing the GO programming language"
 		ansible-playbook $PROGRAMMING_DIR/install_go.yml || { echo "Failure installing the GO programming language"; exit 1; }
-		echo "It is recommended to source your users bash profile prior to executing more commands"
-		echo -e "\nCommand to execute: \"source ~/.bash_profile\"\n"
+		refresh_bash_profile
+	fi
+	if [ "$INSTALL_PYTHON_3_8" == "true" ]; then
+		echo "Installing Python 3.8"
+		ansible-playbook $PROGRAMMING_DIR/install_python_3_8.yml || { echo "Failure installing Python 3.8"; exit 1; }
+		refresh_bash_profile
 	fi
 	if [ "$INSTALL_DOCKER" == "true" ]; then
 		echo "Installing Docker"
@@ -76,18 +86,20 @@ MINIKUBE_DIR=$SCRIPT_DIR/minikube					# Directory for installation of docker/min
 OTHER_DIR=$SCRIPT_DIR/other							# Directory for installation playbooks of random tools
 
 # TODO - add a "all" option to install all tools
-ARGUMENTS=`getopt -n $0 -o "" --long go,docker,minikube,help -- "$@"`
+ARGUMENTS=`getopt -n $0 -o "" --long go,python38,docker,minikube,help -- "$@"`
 if [ $# -eq 0 ]; then help; exit 0; fi
 eval set -- "$ARGUMENTS"
 
-INSTALL_GOLANG="false"	# Determines whether golang is installed
-INSTALL_DOCKER="false"	# Determines whether Docker is installed
-INSTALL_MINIKUBE="false" # Determines whether minikube and docker are installed
+INSTALL_GOLANG="false"		# Determines whether golang is installed
+INSTALL_PYTHON_3_8="false"	# Determines whether python 3.8 is installed
+INSTALL_DOCKER="false"		# Determines whether Docker is installed
+INSTALL_MINIKUBE="false" 	# Determines whether minikube and docker are installed
 
 # Initialize setup
 while true; do
 	case "$1" in
 		--go )			INSTALL_GOLANG="true"; shift ;;
+		--python38 )	INSTALL_PYTHON_3_8="true"; shift ;;
 		--docker )		INSTALL_DOCKER="true"; shift ;;
 		--minikube )	INSTALL_MINIKUBE="true"; shift ;;
 		--help )	help; exit ;;
