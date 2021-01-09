@@ -1,1 +1,72 @@
 # Ansible playbook stub to install Python version 3.8
+- name: Install Python 3.8
+  hosts: local
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Check if Python 3.8 is already installed
+      shell: python3.8 --version
+      register: python_installed
+    - debug:
+        msg: Python 3.8 is already installed. Will exit playbook.
+      when:
+      - python_installed.rc == 0
+    - name: End playbook if Python 3.8 is already installed
+      meta: end_host
+      when:
+      - python_installed.rc == 0
+    - name: Upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+    - name: Ensure development tools are installed
+      yum:
+        name: "@development"
+        state: present
+    - name: Download Python installation dependencies
+      yum:
+        name:
+          - openssl-devel
+          - bzip2-devel
+          - libffi-devel
+        state: present
+    - name: Download latest Python 3.8 release
+      get_url:
+        url: https://www.python.org/ftp/python/3.8.7/Python-3.8.7.tgz
+        dest: /tmp/Python-3.8.7.tgz
+        mode: '0777'
+    - name: Unpack Python media
+      unarchive:
+        src: /tmp/Python-3.8.7.tgz
+        dest: /tmp/
+        mode: '0777'
+    - name: Setup Python installation
+      shell: ./configure --enable-optimizations >> python_configure_log.log
+      args:
+        chdir: /tmp/Python-3.8.7
+    - name: Install Python 3.8
+      shell: make altinstall >> python_install_log.log
+      args:
+        chdir: /tmp/Python-3.8.7
+    - name: Create symbolic for Python 3.8
+      file:
+        src: /usr/local/bin/python3.8
+        dest: /usr/bin/python3.8
+        owner: root
+        group: root
+        mode: '0777'
+        state: link
+    - name: Update environment PATH variable for Python 3.8
+      lineinfile:
+        dest: /etc/profile.d/python38.sh
+        line: export PATH=$PATH:/usr/bin/python3.8
+        state: present
+        insertafter: EOF
+        create: True
+        group: root
+        owner: root
+        mode: '0664'
+    - name: Refresh the current shell session
+      shell: source ~/.bash_profile
+      
+        
