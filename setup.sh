@@ -69,10 +69,12 @@ function main() {
 	if [ "$INSTALL_DOCKER" == "true" ]; then
 		echo "Installing Docker"
 		ansible-playbook $MINIKUBE_DIR/install_docker.yml || { echo "Failure installing Docker"; exit 1; }
+		#sudo usermod -aG docker $USER && newgrp docker
 	fi
 	if [ "$INSTALL_MINIKUBE" == "true" ]; then
 		echo "Installing minikube"
 		ansible-playbook $MINIKUBE_DIR/install_minikube.yml || { echo "Failure installing minikube"; exit 1; }
+		#sudo usermod -aG docker $USER && newgrp docker
 	fi
 	
 	echo "Finished installing!"

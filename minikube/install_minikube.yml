@@ -11,3 +11,23 @@
       yum:
         name: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
         state: present
+    - name: Setup yum for installing kubectl
+      blockinfile:
+        path: /etc/yum.repos.d/kubernetes.repo
+        owner: root
+        group: root
+        create: yes
+        mode: '0664'
+        insertafter: EOF
+        block: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    - name: Install kubectl
+      yum:
+        name: kubectl
+        state: present
