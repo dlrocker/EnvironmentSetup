@@ -44,6 +44,11 @@ function setup_ansible() {
 		cp $inventory_file $ANSIBLE_INVENTORY \
 			|| { echo "Failure creating ansible inventory file"; return 1; }
 	fi
+	
+	homedir=$( getent passwd "$SUDO_USER" | cut -d: -f6 )
+	echo "Adjust permissions of ${homedir}/.ansible so it is accessable by $SUDO_USER"
+	chown -R $SUDO_USER:root ${homedir}/.ansible
+	chmod -R 770 ${homedir}/.ansible
 }
 
 function refresh_bash_profile() {
@@ -68,20 +73,19 @@ function main() {
 	fi
 	if [ "$INSTALL_DOCKER" == "true" ]; then
 		echo "Installing Docker"
-		ansible-playbook $MINIKUBE_DIR/install_docker.yml || { echo "Failure installing Docker"; exit 1; }
-		#sudo usermod -aG docker $USER && newgrp docker
+		su - $SUDO_USER -c "ansible-playbook $MINIKUBE_DIR/install_docker.yml --extra-vars \"SUDO_USER=$SUDO_USER\"" || { echo "Failure installing Docker"; exit 1; }
 	fi
 	if [ "$INSTALL_MINIKUBE" == "true" ]; then
 		echo "Installing minikube"
-		ansible-playbook $MINIKUBE_DIR/install_minikube.yml || { echo "Failure installing minikube"; exit 1; }
-		#sudo usermod -aG docker $USER && newgrp docker
+		su - $SUDO_USER -c "ansible-playbook $MINIKUBE_DIR/install_minikube.yml --extra-vars \"SUDO_USER=$SUDO_USER\"" || { echo "Failure installing minikube"; exit 1; }
 	fi
 	
 	echo "Finished installing!"
 }
 
 # Define constants
-SCRIPT_DIR=$(dirname "$0")
+SCRIPT_PATH=$(realpath $0)
+SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 ANSIBLE_INVENTORY=/etc/ansible/hosts
 PROGRAMMING_DIR=$SCRIPT_DIR/programming_languages	# Directory for programming language installation playbooks
 MINIKUBE_DIR=$SCRIPT_DIR/minikube					# Directory for installation of docker/minikube

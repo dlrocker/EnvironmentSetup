@@ -21,10 +21,15 @@
           - docker-ce
           - docker-ce-cli
           - containerd.io
-    - name: Change file ownership, group and permissions
-      file:
-        path: /var/run/docker.sock
-        mode: '0666'
+    - name: Ensure OS group docker exists
+      group:
+        name: docker
+        state: present
+    - name: Ensure SUDO_USER is part of the docker OS group
+      user:
+        name: "{{ SUDO_USER }}"
+        groups: docker
+        append: yes
     - name: Start docker service
       systemd:
         name: docker

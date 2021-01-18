@@ -11,6 +11,12 @@
       yum:
         name: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
         state: present
+    - name: Start minikube
+      become: yes
+      become_user: "{{ SUDO_USER }}"
+      command: minikube start
+      register: minikube_start
+    - debug: var=minikube_start.stdout_lines
     - name: Setup yum for installing kubectl
       blockinfile:
         path: /etc/yum.repos.d/kubernetes.repo
@@ -31,3 +37,24 @@
       yum:
         name: kubectl
         state: present
+    - name: Download helm
+      get_url:
+        url: https://get.helm.sh/helm-v3.5.0-linux-amd64.tar.gz
+        dest: /tmp/helm-v3.5.0-linux-amd64.tar.gz
+        mode: '0777'
+    - name: Unpack helm media
+      unarchive:
+        src: /tmp/helm-v3.5.0-linux-amd64.tar.gz
+        dest: /tmp/
+        mode: '0777'
+    - name: Install helm
+      command: mv /tmp/linux-amd64/helm /usr/local/bin/helm
+    - name: Cleanup helm media
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/helm-v3.5.0-linux-amd64.tar.gz
+        - /tmp/linux-amd64
+
+      
