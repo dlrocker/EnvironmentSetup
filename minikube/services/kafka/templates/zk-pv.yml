@@ -1,0 +1,18 @@
+# Zookeeper Persistent Volume Claim definition
+{{- if .Values.createPv }}
+{{- range $i, $e := until (.Values.replicaCount | int) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zk-{{ add $i 1 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: {{ $.Values.pvSpec.zkSize }}
+  volumeMode: {{ $.Values.pvSpec.volumeMode }}
+  persistentVolumeReclaimPolicy: {{ $.Values.pvSpec.persistentVolumeReclaimPolicy }}
+  hostPath:
+    path: {{ $.Values.pvSpec.base_mount_path }}/zk_data
+{{- end }}
+{{- end }}

@@ -1,0 +1,13 @@
+# Default values for kafka.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+createPv: true
+pvSpec:
+  kafkaSize: 15G
+  zkSize: 5G
+  base_mount_path: /tmp/
+  persistentVolumeReclaimPolicy: Recycle
+  volumeMode: Filesystem

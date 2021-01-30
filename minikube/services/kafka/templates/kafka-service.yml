@@ -1,0 +1,16 @@
+# Kafka service yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  ports:
+  - name: broker
+    port: 9092
+    targetPort: 9092
+    protocol: TCP
+  selector:
+    app: kafka
+  type: LoadBalancer

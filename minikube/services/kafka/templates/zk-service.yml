@@ -1,0 +1,13 @@
+https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/
+
+https://medium.com/@_oleksii_/how-to-deploy-apache-kafka-cluster-zookeeper-in-kubernetes-c5b04f01ac20
+https://medium.com/oracledevs/15-minutes-to-get-a-kafka-cluster-running-on-kubernetes-and-start-producing-and-consuming-from-a-b0fa7f8bcfeb
+https://technology.amis.nl/platform/kubernetes/running-apache-kafka-on-minikube/
+
+https://github.com/Yolean/kubernetes-kafka/tree/master/kafka
+https://github.com/ramhiser/kafka-kubernetes
+https://github.com/d1egoaz/minikube-kafka-cluster/blob/master/01-zookeeper/02-zookeeper-deployment.yml
+https://github.com/d1egoaz/minikube-kafka-cluster/tree/master/02-kafka
+https://github.com/PharosProduction/tutorial-apache-kafka-cluster/blob/master/zookeeper-ip-service.yaml
+
+https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html

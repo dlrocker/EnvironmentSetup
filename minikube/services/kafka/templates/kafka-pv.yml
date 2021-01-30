@@ -1,0 +1,20 @@
+# Zookeeper Persistent Volume Claim definition
+{{- if .Values.createPv }}
+{{- range $i, $e := until (.Values.replicaCount | int) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-{{ add $i 1 }}
+  labels:
+    app: kafka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: {{ $.Values.pvSpec.kafkaSize }}
+  volumeMode: {{ $.Values.pvSpec.volumeMode }}
+  persistentVolumeReclaimPolicy: {{ $.Values.pvSpec.persistentVolumeReclaimPolicy }}
+  hostPath:
+    path: {{ $.Values.pvSpec.base_mount_path }}/kafka_data
+{{- end }}
+{{- end }}
